@@ -1,13 +1,13 @@
 <?php
 	//define varables
-	define('MESSAGING_PAGE', 'MessagePage.php');	
+	define('MESSAGING_PAGE', 'message.php');	
 	define('LOGIN_HTML', 'login.html');
 	global $dbConnection;
 	$host = "localhost";
-	$database = "test";
+	$database = "accounts";
 	$user = "root";
-	$pass = "ag081493";
-	require 'phpFunctions.php';	
+	$pass = "";
+	require 'functions.php';
 	
 	//establish database connection
 	$dbConnection  = mysqli_connect($host,$user,$pass,$database);
@@ -20,7 +20,7 @@
 	}
 	
 	//start a session
-	session_start();
+	if(session_status()==PHP_SESSION_NONE) session_start();
 	
 	//if logged in
 	if(isloggedin()and !isset($_POST['logout']))	//check if already logged in and not loggin out
@@ -31,10 +31,10 @@
 		header("location: ".MESSAGING_PAGE);		//redirect to messagingPage
 	}
 	//if logging in
-	 else if(isset($_POST['username']) and isset($_POST['password']))
+	 else if(isset($_POST['name']) and isset($_POST['password']))
 	{	
 		//login
-		if (login($_POST['username'],$_POST['password']))
+		if (login($_POST['name'],$_POST['password']))
 		{
 			$_POST = array();
 			echo "Welcome ".$_SESSION['name']."<br/> Redirecting...<br/>";
@@ -45,14 +45,14 @@
 		{
 			$_POST = array();						//clear any post input
 			echo "Login failed. ";
-			include_once LOGIN_HTML;
+			include LOGIN_HTML;
 		}
 	}
 	//if signing up
-	 else if(isset($_POST['newName']) and isset($_POST['newUserName']) and isset($_POST['newPass']))
+	 else if(isset($_POST['newName']) and isset($_POST['newPass']))
 	{	
 		//signup
-		if (signup($_POST['newName'], $_POST['newUserName'],$_POST['newPass']))
+		if (signup($_POST['newName'], $_POST['newPass']))
 		{
 			$_POST = array();
 			echo "Welcome ".$_SESSION['name']."<br/> Redirecting...<br/>";

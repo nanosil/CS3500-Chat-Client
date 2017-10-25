@@ -1,0 +1,154 @@
+/*
+	background blur and photo
+
+*/
+#blur {
+	position: fixed;
+	top: -20px;
+	left: -20px;
+	height: 120%;
+	width: 120%;
+	z-index: 0;
+	filter: blur(20px);
+	display: block;
+	background: #ede46f;
+	background: -moz-linear-gradient(45deg, #ede46f 0%, #a7ce5f 33%, #94c452 66%, #94c452 66%, #2be25f 100%);
+	background: -webkit-linear-gradient(45deg, #ede46f 0%,#a7ce5f 33%,#94c452 66%,#94c452 66%,#2be25f 100%);
+	background: linear-gradient(45deg, #ede46f 0%,#a7ce5f 33%,#94c452 66%,#94c452 66%,#2be25f 100%);
+	background: url('https://geneticliteracyproject.org/wp-content/uploads/2016/03/Colorful-coral-reef.jpg.824x0_q71_crop-scale.jpg');
+	background-size: cover;
+}
+
+#content {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	font-family: 'Open Sans', sans-serif;
+	width: 100%;
+	height: 100%;
+}
+
+#options-container {
+	padding: 5px;
+	float: right;
+	display: inline;
+}
+
+#settings {
+	-webkit-transition: opacity 0.4s linear;   
+  	-moz-transition: opacity 0.4s linear;   
+  	-ms-transition: opacity 0.4s linear;   
+  	-o-transition: opacity 0.4s linear;   
+  	transition: opacity 0.4s linear;
+}
+
+#message-container {
+	display: flex;
+  	flex-direction: column;
+  	height: 100%;
+  	width: 60%;
+  	margin: auto;
+}
+
+#messagebox {
+	width: 100%;
+	height: 100%;
+	background: #fafafa;
+	margin: auto;
+	box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.4);
+    overflow: auto;
+    flex-grow: 100;
+    position: relative;
+}
+
+#inputarea {
+	margin: auto;
+	width: 100%;
+	border-top: solid 1px #d0d0d0;
+	background: #e9e9e9;
+	overflow: hidden;
+}
+
+#textbox {
+	border-bottom: solid 1px #d0d0d0;
+	padding: 7px 7px;
+	display: flex;
+	box-sizing: border-box;
+}
+
+#emoticon {
+
+}
+
+#textbox input {
+	height: auto;
+	border-radius: 10px;
+	font-size: 16px;
+	border: solid 1px #d0d0d0;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+}
+
+#textbox input:focus{
+    outline: none;
+    border-bottom: inset 1px #2be25f;
+}
+
+.textbox {
+	padding: 3px 10px;
+	flex-grow: 100;
+	box-sizing: border-box;
+}
+
+.emoji {
+	height: 30px;
+	width: 30px;
+}
+
+.message {
+	width: auto;
+	display: inline-block;
+	padding: 10px;
+	min-height: 100px;
+	min-width: 100px;
+	margin: 0px 10px;
+	display: flex;
+	align-items: stretch;
+}
+
+.username {
+	font-size: 20px;
+	margin-bottom: 3px;
+}
+
+.messageavatar {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	margin-right: 10px;
+}
+
+.messagecontentcontainer {
+	min-width: 0;
+}
+
+.messagecontent {
+	word-wrap: break-word;
+	text-overflow: ellipsis;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+ 
+::-webkit-scrollbar-track {
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(43,226,95,1); 
+}
+::-webkit-scrollbar-thumb:window-inactive {
+	background: rgba(43,226,95,0.8); 
+}
