@@ -5,6 +5,13 @@ To create a web-based chat client and server that supports the transfer of text 
 
 ### Status
 Basic user interface completed and server has been successfully tested.
+Database is functional and tables have been created.
+Account creation and signing in fully functional.
+Messaging slightly functional.
 
-### Next Step
-Set up a database and begin work on user accounts.
+### Next Steps
+Fix sessions.
+Create user customization.
+Fix submit button.
+Finish messaging so that new messages that are sent from one user appear to the other users.
+⋅⋅* Redo the messaging to use JavaScript.
