@@ -5,6 +5,7 @@ $database = "accounts";
 $user = "root";
 $pass = "";
 require 'functions.php';
+//require 'retrieve.php';
 $dbConnection  = mysqli_connect($host,$user,$pass,$database);
 $error= mysqli_connect_error();
 if($error !=null)
@@ -23,6 +24,7 @@ if(session_status()==PHP_SESSION_NONE) session_start();
 	<link rel="stylesheet" href="style.css">
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel="stylesheet">
 	<script src="http://twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+	 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script type="text/javascript">
 		function toggleSettings() {
 			document.getElementById("settings").style.position = 'static';
@@ -44,6 +46,14 @@ if(!isset($_SESSION['id'])) {
 			<div id="messagebox">
 				<?php getMessages();
 				getID($_SESSION['name'], $_SESSION['password']); ?>
+				<script>
+		window.setInterval(function(){
+		  $('#buffer').load('retrieve.php');
+		  document.getElementById("messagebox").innerHTML = document.getElementById("buffer").innerHTML;
+		  var messageBody = document.querySelector('#messagebox');
+		messageBody.scrollTop = messageBody.scrollHeight;
+		}, 500);
+	 </script>
 			</div>
 			<div id="inputarea">
 				<div id="settings" style="position: absolute; opacity: 0;">
@@ -61,9 +71,7 @@ if(!isset($_SESSION['id'])) {
 	<!--Background-->
 	<div id="blur">
 	</div>	
-	<script type="text/javascript">twemoji.parse(document.body)
-	var messageBody = document.querySelector('#messagebox');
-	var inputBody = document.querySelector('#inputarea');
-		messageBody.scrollTop = messageBody.scrollHeight;</script>
+	<div id="buffer" style="display: none;"></div>
+	<script type="text/javascript">twemoji.parse(document.body)</script>
 </body>
 </html>
