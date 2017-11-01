@@ -19,7 +19,7 @@ $dbConnection  = mysqli_connect($host,$user,$pass,$database);
 	{	
 		global $dbConnection;
 		//sanatize input
-		$username = mysqli_real_escape_string($dbConnection,$username);
+		$username = mysqli_real_escape_string($dbConnection,$name);
 		$password = mysqli_real_escape_string($dbConnection,$password);
 		
 		//make query
@@ -53,10 +53,20 @@ $dbConnection  = mysqli_connect($host,$user,$pass,$database);
 		$password = mysqli_real_escape_string($dbConnection,$password);
 		$password = md5($password);	//hash password
 		$name = mysqli_real_escape_string($dbConnection,$name);
+		$id = "";
 		
 		//insert into database
 		$sql = "INSERT INTO user (name, password) VALUES ('".$name."', '".$password."')";
 		$result = mysqli_query($dbConnection, $sql);
+		
+		$sql = "SELECT id FROM user WHERE name = '".$name."' AND password = '".$password."'";
+		$result = mysqli_query($dbConnection, $sql);
+		$row = mysqli_fetch_assoc($result);
+		$_SESSION['id'] = $row["id"];
+		
+		$sql = "INSERT INTO prefs (uid) VALUES (".$_SESSION['id'].")";
+		$result = mysqli_query($dbConnection, $sql);
+		
 		if(mysqli_affected_rows($dbConnection)>0)
 		{
 			$_SESSION['name'] = $name;
@@ -86,25 +96,78 @@ $dbConnection  = mysqli_connect($host,$user,$pass,$database);
 		global $dbConnection;
 		
 		//make query
-		$sql = "SELECT content, time, name FROM messages, user WHERE user.id = messages.uid";
+		$sql = "SELECT content, time, name, bg, color FROM messages, user, prefs WHERE user.id = messages.uid AND user.id = prefs.uid";
 		$result = mysqli_query($dbConnection, $sql);
 		if(!$result)
 		{
 			echo "SQL error: ".mysqli_error ($dbConnection);
 			return false;
 		} else {
+			$first = true;
+			$c = 0;
+			$prevUser = "";
 			while ($row = $result -> fetch_assoc()) {
-    			echo "<div id='' class='message'>";
-					echo "<img src='http://i0.kym-cdn.com/entries/icons/facebook/000/022/022/C2AAMCLVQAESU6Z.jpg' class='messageavatar' />";
+				if($prevUser == $row['name'] && $c < 5) {
+					$first = false;
+					echo "<p>".$row['content']."</p>";
+					$c++;
+				} else if($prevUser != $row['name'] && !$first) {
+					echo "</div>";
+					echo "</div>";
+					echo "</div>";
+					echo "<div id='' class='message'>";
+					echo "<img src='images/avatars/".$row['bg'].".png' class='avatar' />";
 					echo "<div id='' class='messagecontentcontainer'>";
-						echo "<div id='' class='username'>".$row['name']."</div>";
-						echo "<small>".$row['time']."</small>";
-							echo "<div id='' class='messagecontent'>";
-						echo "<p>".$row['content']."</p>";			
+					echo "<div id='' class='username' style='color: ".$row['color']."'>".$row['name']."</div>";
+					$prevUser = $row['name'];
+					$c = 0;
+					echo "<small>".$row['time']."</small>";
+					echo "<div id='' class='messagecontent'>";
+					echo "<p>".$row['content']."</p>";					
+				} else if($prevUser == $row['name'] && $c >= 5) {
+					$first = false;
+					echo "</div>";
+					echo "</div>";
+					echo "</div>";
+					echo "<div id='' class='message'>";
+					echo "<img src='images/avatars/".$row['bg'].".png' class='avatar' />";
+					echo "<div id='' class='messagecontentcontainer'>";
+					echo "<div id='' class='username' style='color: ".$row['color']."'>".$row['name']."</div>";
+					$prevUser = $row['name'];
+					$c = 0;
+					echo "<small>".$row['time']."</small>";
+					echo "<div id='' class='messagecontent'>";
+					echo "<p>".$row['content']."</p>";					
+				} else if($first) {
+					$first = false;
+					echo "<div id='' class='message'>";
+					echo "<img src='images/avatars/".$row['bg'].".png' class='avatar' />";
+					echo "<div id='' class='messagecontentcontainer'>";
+					echo "<div id='' class='username' style='color: ".$row['color']."'>".$row['name']."</div>";
+					$prevUser = $row['name'];
+					$c = 0;
+					echo "<small>".$row['time']."</small>";
+					echo "<div id='' class='messagecontent'>";
+					echo "<p>".$row['content']."</p>";
+				}
+				/*
+    			echo "<div id='' class='message'>";
+				echo "<img src='images/avatars/".$row['bg'].".png' class='avatar' />";
+					echo "<div id='' class='messagecontentcontainer'>";
+					echo "<div id='' class='username' style='color: ".$row['color']."'>".$row['name']."</div>";
+					$prevName = $row['name'];
+					$c = 0;
+					echo "<small>".$row['time']."</small>";
+						echo "<div id='' class='messagecontent'>";
+							echo "<p>".$row['content']."</p>";
 						echo "</div>";
 					echo "</div>";
 				echo "</div>";
+				*/
 			}
+			echo "</div>";
+			echo "</div>";
+			echo "</div>";
 		}
 	}
 	
@@ -125,7 +188,21 @@ $dbConnection  = mysqli_connect($host,$user,$pass,$database);
 	}
 	
 	//to do
-	function getID() {
-		
+	function getID($name, $password) {
+		global $dbConnection;
+		//make query
+		$sql = "SELECT id FROM user WHERE name = '".$name."' AND password = '".$password."'";
+		$result = mysqli_query($dbConnection, $sql);
+		if(!$result)
+		{
+			echo "SQL error: ".mysqli_error ($dbConnection);
+			return false;
+		}
+		else
+		{
+			$row = mysqli_fetch_assoc($result);
+			$_SESSION['id'] = $row['id'];
+			return true;
+		}
 	}
 ?>
