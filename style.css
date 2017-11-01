@@ -138,6 +138,12 @@
 	text-overflow: ellipsis;
 }
 
+.avatar {
+	margin-right: 10px;
+	height: 100px;
+	width: 100px;
+}
+
 ::-webkit-scrollbar {
     width: 4px;
 }
