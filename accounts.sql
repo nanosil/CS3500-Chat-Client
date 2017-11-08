@@ -1,15 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.4
--- https://www.phpmyadmin.net/
+-- version 4.5.1
+-- http://www.phpmyadmin.net
 --
--- Host: localhost
--- Generation Time: Nov 08, 2017 at 12:15 AM
--- Server version: 10.1.26-MariaDB
--- PHP Version: 7.1.9
+-- Host: 127.0.0.1
+-- Generation Time: Nov 08, 2017 at 09:58 AM
+-- Server version: 10.1.10-MariaDB
+-- PHP Version: 7.0.2
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -59,45 +57,37 @@ INSERT INTO `avatars` (`name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `colors`
+-- Table structure for table `backgrounds`
 --
 
-CREATE TABLE `colors` (
-  `color` varchar(20) COLLATE utf8_bin NOT NULL
+CREATE TABLE `backgrounds` (
+  `bgID` int(11) NOT NULL,
+  `filename` text COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
--- Dumping data for table `colors`
+-- Dumping data for table `backgrounds`
 --
 
-INSERT INTO `colors` (`color`) VALUES
-('navy'),
-('blue'),
-('green'),
-('teal'),
-('deepskyblue'),
-('dodgerblue'),
-('seagreen'),
-('darkslategray'),
-('royalblue'),
-('indigo'),
-('purple'),
-('slateblue'),
-('chartreuse'),
-('maroon'),
-('red'),
-('brown'),
-('sienna'),
-('darkgoldenrod'),
-('chocolate'),
-('goldenrod'),
-('yellow'),
-('orange'),
-('gold'),
-('coral'),
-('hotpink'),
-('white'),
-('black');
+INSERT INTO `backgrounds` (`bgID`, `filename`) VALUES
+(1, 'Capture.JPG'),
+(2, 'flight-sunset-red-clouds.jpg'),
+(3, 'pexels-photo-57007.jpeg'),
+(4, 'pexels-photo-134074.jpeg'),
+(5, 'pexels-photo-167679.jpeg'),
+(6, 'pexels-photo-209679.jpeg'),
+(7, 'pexels-photo-235725.jpeg'),
+(8, 'pexels-photo-270360.jpeg'),
+(9, 'pexels-photo-371633.jpeg'),
+(10, 'pexels-photo-414765.jpeg'),
+(11, 'pexels-photo-414775.jpeg'),
+(12, 'pexels-photo-461039.jpeg'),
+(13, 'pexels-photo-479817.jpeg'),
+(14, 'pexels-photo-533816.jpeg'),
+(15, 'pexels-photo-583841.jpeg'),
+(16, 'pexels-photo-589819.jpeg'),
+(17, 'tomatoes-tomato-mozzarella-basil-mozzarella-144239.jpeg'),
+(18, 'wood-forest-heat-heating.jpg');
 
 -- --------------------------------------------------------
 
@@ -150,7 +140,11 @@ INSERT INTO `messages` (`mid`, `uid`, `content`, `time`) VALUES
 (611, 42, 'ðŸ‘€ðŸ‘€ðŸ‘€ðŸŽ©ðŸŽ©ðŸŽ©ðŸ§ðŸ§ðŸ§ðŸŸðŸŸðŸŸ', '2017-11-07 23:55:02'),
 (612, 43, 'message', '2017-11-08 00:01:07'),
 (613, 43, 'âš™', '2017-11-08 00:01:39'),
-(614, 43, 'ðŸ§ðŸ§ðŸ§ðŸ§ðŸ§ðŸ§ðŸ§', '2017-11-08 00:01:53');
+(614, 43, 'ðŸ§ðŸ§ðŸ§ðŸ§ðŸ§ðŸ§ðŸ§', '2017-11-08 00:01:53'),
+(615, 0, '', '2017-11-08 08:21:51'),
+(616, 0, '', '2017-11-08 08:24:01'),
+(617, 0, '', '2017-11-08 08:27:09'),
+(618, 0, '', '2017-11-08 08:27:12');
 
 -- --------------------------------------------------------
 
@@ -180,7 +174,8 @@ INSERT INTO `prefs` (`uid`, `avatar`, `bg`, `theme`, `color`) VALUES
 (40, 'snake', 0, 0, 'black'),
 (41, 'doggo', 0, 0, 'black'),
 (42, 'pika', 0, 0, 'green'),
-(43, 'cool', 0, 0, 'blue');
+(43, 'cool', 0, 0, 'blue'),
+(44, 'confused', 0, 0, 'green');
 
 -- --------------------------------------------------------
 
@@ -208,11 +203,18 @@ INSERT INTO `user` (`name`, `id`, `password`) VALUES
 ('blob', 40, 'ee26908bf9629eeb4b37dac350f4754a'),
 ('new', 41, '22af645d1859cb5ca6da0c484f1f37ea'),
 ('newaccount', 42, '4288a009bb6e9c4560c9e1a467ffb656'),
-('penguin', 43, '24f7ca5f6ff1a5afb9032aa5e533ad95');
+('penguin', 43, '24f7ca5f6ff1a5afb9032aa5e533ad95'),
+('ferr', 44, 'e807f1fcf82d132f9bb018ca6738a19f');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `backgrounds`
+--
+ALTER TABLE `backgrounds`
+  ADD UNIQUE KEY `bgID` (`bgID`);
 
 --
 -- Indexes for table `messages`
@@ -240,15 +242,12 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `mid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=615;
-
+  MODIFY `mid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=619;
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
-COMMIT;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

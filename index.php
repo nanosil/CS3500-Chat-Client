@@ -6,7 +6,7 @@
 	$host = "localhost";
 	$database = "accounts";
 	$user = "root";
-	$pass = "";
+	$pass = "ag081493";
 	require 'functions.php';
 	
 	//establish database connection

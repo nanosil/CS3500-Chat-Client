@@ -1,21 +1,6 @@
 <?php
 //initialize database connection
 global $dbConnection;
-//server address 127.0.0.1
-$host = "localhost";
-//name of the database to use
-$database = "accounts";
-//sql username
-$user = "root";
-//sql password
-$pass = "";
-//connects to the database
-$dbConnection  = mysqli_connect($host,$user,$pass,$database);
-
-//start a session if a session has not been started
-if(session_status() == PHP_SESSION_NONE) {
-	session_start();
-}
 
 //returns name of the user
 function isloggedin()
@@ -40,12 +25,15 @@ function login($name, $password)
 	//returns sql data
 	$result = mysqli_query($dbConnection, $sql);
 	//if query returned an error
-	if(!$result) {
+	if(!$result)
+	{
 		//return error message to user
 		echo "SQL error: ".mysqli_error ($dbConnection);
 		return false;
-	//else if any data was returned from successful query
-	} else if(mysqli_num_rows($result) > 0) {
+	
+	} //else if any data was returned from successful query
+	else if(mysqli_num_rows($result) > 0)
+	{
 		//store sql data into php object
 		$row = mysqli_fetch_assoc($result);
 		//store queried data into sessions	
@@ -53,8 +41,9 @@ function login($name, $password)
 		$_SESSION['id'] = $row["id"];
 		$_SESSION['password'] = $row["password"];
 		return true;
-	//if query was successful but no data was returned
-	} else {
+	}
+	else//if query was successful but no data was returned
+	{
 		//nothing happens
 		return false;
 	}
@@ -87,12 +76,15 @@ function signup($name, $password)
 	$result = mysqli_query($dbConnection, $sql);
 	
 	//store the input into a session
-	if(mysqli_affected_rows($dbConnection)>0) {
+	if(mysqli_affected_rows($dbConnection)>0)
+	{
 		$_SESSION['name'] = $name;
 		$_SESSION['password'] = $password;
 		return true;
 	//else return error
-	} else {
+	}
+	else
+	{
 		echo "SQL error: ".mysqli_error ($dbConnection);
 		return false;
 	}
@@ -101,17 +93,19 @@ function signup($name, $password)
 //removes session variables when user logs out
 function logout()
 {
-	if(isloggedin()) {
+	if(isloggedin())
+	{
 		unset($_SESSION['name']);
 		unset($_SESSION['password']);
 		unset($_SESSION['id']);
 		return true;
-	} else {
-		return false;
 	}
+	else
+		return false;
 }
 
-function getID($name, $password) {
+function getID($name, $password)
+{
 	global $dbConnection;
 	$sql = "SELECT id FROM user WHERE name = '".$name."' AND password = '".$password."'";
 	$result = mysqli_query($dbConnection, $sql);
@@ -128,25 +122,19 @@ function getID($name, $password) {
 	}
 }
 
-function getColors() {
-	global $dbConnection;
-	$sql = "SELECT * FROM colors";
-	$result = mysqli_query($dbConnection, $sql);
-	if(!$result)
-	{
-		echo "SQL error: ".mysqli_error ($dbConnection);
-		return false;
-	}
-	else
-	{
-		while ($row = $result -> fetch_assoc()) {
-			echo "<div class='color' style='background-color: ".$row['color']."' onclick='return updateColor(\"".$row['color']."\")' ></div>";
-		}
-		return true;
-	}
+function getColors()
+{
+	$colors = ["navy","blue","green","teal","deepskyblue", "dodgerblue","seagreen","darkslategray"];
+	$temp =["royalblue","indigo","purple","slateblue","chartreuse","maroon","red","brown","sienna"];
+	$colors = array_merge($colors,$temp);
+	$temp=["darkgoldenrod","chocolate","goldenrod","yellow","orange","gold","coral","hotpink"];
+	$colors = array_merge($colors,$temp);
+	foreach($colors as $value)
+		echo "<div class='color' style='background-color: ".$value."' onclick='return updateColor(\"".$value."\")' ></div>";
 }
 
-function getAvatars() {
+function getAvatars()
+{
 	global $dbConnection;
 	$sql = "SELECT * FROM avatars";
 	$result = mysqli_query($dbConnection, $sql);
@@ -157,13 +145,143 @@ function getAvatars() {
 	}
 	else
 	{
-		while ($row = $result -> fetch_assoc()) {
+		while ($row = $result -> fetch_assoc())
+		{
 			$name = $row["name"];
-			echo "<img src='images/avatars/".$name.".png' class='thumbnail' id='".$name."'  onclick='return updateAvatar(\"".$name."\")'/>";
+			echo "<img src='images/avatars/".$name.".png' class='thumbnail' id='".$name."' onclick='return updateAvatar(\"".$name."\")'/>";
 		}
 		return true;
 	}
 }
 
-//put getBackgrounds() here
+function getMessagesOnLoad()
+{
+	global $dbConnection;
+	//gets content, time sent, username, profile picture, and username color of each message in the database
+	$sql = "SELECT content, time, name, avatar, color FROM messages, user, prefs WHERE user.id = messages.uid AND user.id = prefs.uid";
+	
+	$result = mysqli_query($dbConnection, $sql);
+	
+	if(!$result)
+	{
+		echo "SQL error: ".mysqli_error ($dbConnection);
+		return false;
+	} 
+	if(mysqli_num_rows($result) > 0)
+	{
+		//boolean that determines if the first message found in the query has been printed or not
+		$first = true;
+		//counter to determine amount of consecutive messages with the same username
+		$c = 0;
+		//name of the user from the previous row in sql result
+		$prevUser = "";
+		//loops for each row found from the sql query
+		while ($row = $result -> fetch_assoc())
+		{
+			//if the current message was from the same user as the previous message and this is not the sixth consecutive post from that user
+			if($prevUser == $row['name'] && $c < 5)
+			{
+				//only echo the message content itself
+				echo "<p>".$row['content']."</p>";
+				//increment the counter
+				$c++;
+				//else if the current message is from a different user than the previous message and this is not the first message returned from the sql query
+			}
+			else if($prevUser != $row['name'] && !$first)
+			{
+				//close the three divs that were opened from the previous user
+				//since we know this is not the first message returned from the sql query, we are guaranteed to close the three divs that were opened from the previous user's messages
+				echo "</div>";
+				echo "</div>";
+				echo "</div>";
+				
+				//begin echoing data of the current sql query row
+				echo "<div id='' class='message'>";
+				//prints user's avatar
+				echo "<img src='images/avatars/".$row['avatar'].".png' class='avatar' />";
+				
+				//begins the div that contains all the text data of the message i.e. not the avatar
+				echo "<div id='' class='messagecontentcontainer'>";
+				
+				//prints user's name and gives it the appropriate color
+				echo "<div id='' class='username' style='color: ".$row['color']."'>".$row['name']."</div>";
+				
+				//store the name of the user so we can compare it with the next row in the sql query
+				$prevUser = $row['name'];
+				//set counter to zero since we know this is this user's first nonconsecutive message
+				$c = 0;
+				
+				//prints the timestamp of the message
+				echo "<small>".$row['time']."</small>";
+				
+				//prints the content of the message itself
+				echo "<div id='' class='messagecontent'>";
+				echo "<p>".$row['content']."</p>";			
+				//else if the current user is the same as the previous user but this is their sixth consecutive message
+			} 
+			else if($prevUser == $row['name'] && $c >= 5)
+			{
+				//previous if block explains all the code below
+				echo "</div>";
+				echo "</div>";
+				echo "</div>";
+				echo "<div id='' class='message'>";
+				echo "<img src='images/avatars/".$row['avatar'].".png' class='avatar' />";
+				echo "<div id='' class='messagecontentcontainer'>";
+				echo "<div id='' class='username' style='color: ".$row['color']."'>".$row['name']."</div>";
+				$prevUser = $row['name'];
+				$c = 0;
+				echo "<small>".$row['time']."</small>";
+				echo "<div id='' class='messagecontent'>";
+				echo "<p>".$row['content']."</p>";				
+				//else if this is the first message in the database	
+			} 
+			else if($first)
+			{
+				//there are no divs to close since this is the first message that is being processed and no divs have been opened yet
+				//since we are processing the first message in the database, all of the following messages will not be the first
+				$first = false;
+				
+				//all code below is explained in prior if block
+				echo "<div id='' class='message'>";
+				echo "<img src='images/avatars/".$row['avatar'].".png' class='avatar' />";
+				echo "<div id='' class='messagecontentcontainer'>";
+				echo "<div id='' class='username' style='color: ".$row['color']."'>".$row['name']."</div>";
+				$prevUser = $row['name'];
+				$c = 0;
+				echo "<small>".$row['time']."</small>";
+				echo "<div id='' class='messagecontent'>";
+				echo "<p>".$row['content']."</p>";
+			}
+		}
+		//closes the tags that were opened in the very last message block returned from the whole sql query
+		echo "</div>";
+		echo "</div>";
+		echo "</div>";
+		//if no messages exist in the db
+	} 
+	else 
+		echo "No messages yet.";
+}
+
+function getBackgrounds()
+{
+	global $dbConnection;
+	$sql = "SELECT * FROM backgrounds";
+	$result = mysqli_query($dbConnection, $sql);
+	if(!$result)
+	{
+		echo "SQL error: ".mysqli_error ($dbConnection);
+		return false;
+	}
+	else
+	{
+		while ($row = $result -> fetch_assoc())
+		{
+			echo "<img height=\"42\" width=\"42\" src = 'images/backgrounds/".$row["filename"]."'>";
+		}
+		return true;
+	}
+}
+
 ?>
