@@ -14,7 +14,7 @@
 	$error= mysqli_connect_error();
 	if($error !=null)
 	{
-		$output = "<p class = \"messagecontent\">Unable to connect to DB <p> ".$error;
+		$output = "<p class = 'message'>Unable to connect to DB <p>".$error;
 		echo $output;
 		die();
 	}
@@ -44,7 +44,7 @@
 		else
 		{
 			$_POST = array();						//clear any post input
-			echo "Login failed. ";
+			echo "<p class = 'message'>Login failed.</p>";
 			include LOGIN_HTML;
 		}
 	}
@@ -69,9 +69,9 @@
 	{
 		$_POST = array();							//clear any post input
 		if(logout())
-			echo "Logout Succesful<br>";
+			echo "<p class = 'message'>Logout Succesful</p>";
 		else
-			echo "Logout Unsussefull<br>";
+			echo "<p class = 'message'>Logout Unsuccessful<p>";
 		include LOGIN_HTML;
 	}
 	else

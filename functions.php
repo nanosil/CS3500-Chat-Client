@@ -5,7 +5,8 @@ global $dbConnection;
 //returns name of the user
 function isloggedin()
 {
-	return isset($_SESSION['name']);
+	
+	return isset($_SESSION['name'])&&isset($_SESSION['id']);
 }
 
 //checks if the name and password entered by the user are in the database
@@ -42,11 +43,8 @@ function login($name, $password)
 		$_SESSION['password'] = $row["password"];
 		return true;
 	}
-	else//if query was successful but no data was returned
-	{
-		//nothing happens
+	else//if query was successful but no data was returned, nothing happens
 		return false;
-	}
 }
 
 //stores user input data into the database
@@ -81,7 +79,6 @@ function signup($name, $password)
 		$_SESSION['name'] = $name;
 		$_SESSION['password'] = $password;
 		return true;
-	//else return error
 	}
 	else
 	{
@@ -102,24 +99,6 @@ function logout()
 	}
 	else
 		return false;
-}
-
-function getID($name, $password)
-{
-	global $dbConnection;
-	$sql = "SELECT id FROM user WHERE name = '".$name."' AND password = '".$password."'";
-	$result = mysqli_query($dbConnection, $sql);
-	if(!$result)
-	{
-		echo "SQL error: ".mysqli_error ($dbConnection);
-		return false;
-	}
-	else
-	{
-		$row = mysqli_fetch_assoc($result);
-		$_SESSION['id'] = $row['id'];
-		return true;
-	}
 }
 
 function getColors()
@@ -280,6 +259,23 @@ function getBackgrounds()
 		{
 			echo "<img height=\"42\" width=\"42\" src = 'images/backgrounds/".$row["filename"]."'>";
 		}
+		return true;
+	}
+}
+function getTheme()
+{
+	global $dbConnection;
+	$sql = "SELECT theme FROM prefs WHERE uid = '".$_SESSION["id"]."'";
+	$result = mysqli_query($dbConnection, $sql);
+	if(!$result)
+	{
+		echo "light";
+		return false;
+	}
+	else
+	{
+		$row = mysqli_fetch_assoc($result);
+		echo $row["theme"];
 		return true;
 	}
 }

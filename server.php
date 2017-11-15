@@ -49,9 +49,11 @@
 			$header = socket_read($socket_new, 1024); //read data sent by the socket
 			perform_handshaking($header, $socket_new, $host, $port); //perform websocket handshake
 			
+			//broadcast ip address of this new client
 			socket_getpeername($socket_new, $ip); //get ip address of connected socket
 			$response = mask(json_encode(array('type'=>'system', 'message'=>$ip.' connected'))); //prepare json data
 			send_message($response); //notify all users about new connection
+			printf("New connection on ip address: %s", $ip);
 			
 			//make room for new socket
 			$found_socket = array_search($socket, $changed);
@@ -68,6 +70,7 @@
 				$tst_msg = json_decode($received_text); 	//json decode 
 				$type = $tst_msg->type;
 				$uid = $tst_msg->uid;
+
 				if($type == "avatar")						//if updating the avatar
 				{
 					$error=updateAvatarDB($tst_msg->avatar,$uid);
@@ -80,7 +83,7 @@
 					if($error)
 						sendErr("Updating Color DB Error");
 				}
-				else 										//if sending a message
+				else if($type =="usermsg")									//if sending a message
 				{
 					$user_message = $tst_msg->message; 		//message text
 					$time = date("Y-m-d H:i:s");			//server time
@@ -89,6 +92,8 @@
 					$error = writeToDB($uid, $user_message, $time);
 					if($error)
 						sendErr("Writting Message to DB Error");
+					else 
+						sendErr("succesfully wrote user mess to DB");
 				
 					//prepare data to be sent to client
 					$response_text = mask(json_encode(array('type'=>'usermsg', 'uid'=>$uid, 'message'=>$user_message,'time'=>$time)));
@@ -220,10 +225,18 @@
 		global $dbConnection;
 		//make query
 		$sql = "INSERT INTO messages (uid, content, time) VALUES ('{$uid}', '{$content}', '{$time}')";
+		printf($sql."\n");
 		$result = mysqli_query($dbConnection, $sql);
-		if(!$result)
+		$affRows =mysqli_affected_rows($dbConnection);
+		printf("Affected rows is: ".$affRows);
+		if($affRows>0)
+		{
+	
 			return false;
+		}
 		else
+		{
 			return true;
+		}
 	}
-	?>
+?>
