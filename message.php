@@ -50,15 +50,21 @@
 				header("location: login.html");
 			
 			//this will be the header----
-			echo "<div id = 'uid' style = 'display: none'>".$_SESSION["id"]."</div";
+			echo "<div id = 'uid' style = 'display: none'>".$_SESSION["id"]."</div>";
+			echo "<div id = 'bgName' style = 'display: none'>";getBgName();echo "</div>";
+			echo "<div id = 'bgID' style = 'display: none'>";getBgID();echo "</div>";
 		?>
+		<aside id = "leftRail">
+		<!--System messages go here-->
+		<p> System Messages</p>
+		</aside>
 		<div id= "message-container">
 			<header>
-				<p>Welcome, <?php $_SESSION["name"]?>!!</p>
+				<p>Welcome, <?php echo $_SESSION['name']; ?>!!<p>
 				<div id="content" class="<?php getTheme();?>">
 				</div>
 				<form action = "index.php" method = "post">
-					<input type = "submit" name = "logout" value = "logout">
+					<input id= "logoutButton" type = "submit" name = "logout" value = "logout">
 				</form>
 			</header>			
 			<div id="messagebox">

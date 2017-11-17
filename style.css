@@ -1,11 +1,49 @@
-/*
-	background blur and photo
-
-*/
+.backgrounds
+{
+	height: 40px;
+	width: 40px;
+}
 header
 {
-	width: 60%;
-	text-align: center;
+    width: 100%;
+    background: #fafafa;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    padding: 10px 10px 10px 10px;
+    position:relative;
+    border-radius: 7px;
+}
+header p
+{
+	display: inline;
+	font-weight: bold;
+	font-size: 150%;
+}
+#logoutButton, #send-btn
+{
+	background: #fafafa;
+    border-radius: 7px;
+    box-shadow: 0 1px #202020;
+    padding: 5px 10px 5px 10px ;
+}
+#leftRail
+{
+	background:#fafafa;
+	position: absolute;
+	top:20px;
+	left:20px;
+	width:19vw;
+	float:left;
+	box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.4);
+	padding: 10px 10px 10px 10px ;
+    border-radius: 7px;
+}
+form
+{
+	display: inline;
+	width:50px;
+	position:absolute;
+	right:50px;
 }
 	
 #blur {
@@ -56,30 +94,36 @@ header
 #message-container {
 	display: flex;
   	flex-direction: column;
-  	height: 100%;
-  	width: 60%;
+  	height: 98vh;
+  	width: 70%;
   	margin: auto;
   	overflow: hidden;
+  	position:absolute;
+  	left: 25vw;
+  	top: 10px;
 }
 
 #messagebox {
-	width: 60%;
+	width: 100%;
 	height: 100%;
 	background: #fafafa;
 	margin: auto;
+	margin-bottom: 5px;
 	box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.4);
 	overflow: auto;
 	flex-grow: 100;
 	position: relative;
+    border-radius: 7px;
 }
 
 #inputarea {
 	margin: auto;
-	width: 60%;
+	width: 100%;
 	border-top: solid 1px #d0d0d0;
 	background: #e9e9e9;
 	overflow: hidden;
 	flex: none;
+	padding: 10px 10px 10px 10px;
 }
 
 #textbox {
@@ -96,7 +140,8 @@ header
 	padding: 7px 7px;
 	display: flex;
 	box-sizing: border-box;
-	width: 100%;
+	width: 70%;
+	display:inline;
 }
 
 #textbox input {

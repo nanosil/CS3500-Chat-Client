@@ -53,7 +53,7 @@
 			socket_getpeername($socket_new, $ip); //get ip address of connected socket
 			$response = mask(json_encode(array('type'=>'system', 'message'=>$ip.' connected'))); //prepare json data
 			send_message($response); //notify all users about new connection
-			printf("New connection on ip address: %s", $ip);
+			printf("New connection on ip address: %s\n", $ip);
 			
 			//make room for new socket
 			$found_socket = array_search($socket, $changed);
@@ -68,18 +68,26 @@
 			{
 				$received_text = unmask($buf); 				//unmask data
 				$tst_msg = json_decode($received_text); 	//json decode 
+				if (!isset($tst_msg->type))
+				break 2; 
 				$type = $tst_msg->type;
 				$uid = $tst_msg->uid;
-
+				
 				if($type == "avatar")						//if updating the avatar
 				{
 					$error=updateAvatarDB($tst_msg->avatar,$uid);
 					if($error)
-						sendErr("Updating Avatar DB Error");
+					sendErr("Updating Avatar DB Error");
 				}
 				else if($type =="color")					//if updating the color
 				{
 					$error = updateColorDB($tst_msg->colorName,$uid);
+					if($error)
+						sendErr("Updating Color DB Error");
+				}
+				else if($type =="bg")					//if updating the color
+				{
+					$error = updateBGDB($uid,$tst_msg->bgID);					
 					if($error)
 						sendErr("Updating Color DB Error");
 				}
@@ -91,10 +99,8 @@
 					//write to DB
 					$error = writeToDB($uid, $user_message, $time);
 					if($error)
-						sendErr("Writting Message to DB Error");
-					else 
-						sendErr("succesfully wrote user mess to DB");
-				
+					sendErr("Writting Message to DB Error");
+					
 					//prepare data to be sent to client
 					$response_text = mask(json_encode(array('type'=>'usermsg', 'uid'=>$uid, 'message'=>$user_message,'time'=>$time)));
 					send_message($response_text); 				//send data
@@ -125,16 +131,36 @@
 		send_message($response); 				//notify all users about error
 	}
 	
+	function updateBGDB($uid,$bgID)
+	{
+		global $dbConnection;
+		//updates the preferred background of the user's name
+		$sql = "UPDATE prefs SET bg = '".$bgID."' WHERE uid = '".$uid."'";
+		printf($sql."\n");
+		$result = mysqli_query($dbConnection, $sql);
+		if($error = mysqli_error($dbConnection)=="")
+			return false;
+		else
+		{
+			printf("DB error ".$error."\n");
+			return true;
+		}
+	}
+	
 	function updateColorDB($color,$uid)
 	{
 		global $dbConnection;
 		//updates the preferred color of the user's name
 		$sql = "UPDATE prefs SET color = '".$color."' WHERE uid = '".$uid."'";
+		printf($sql."\n");
 		$result = mysqli_query($dbConnection, $sql);
-		if(!$result)
+		if($error = mysqli_error($dbConnection)=="")
 			return false;
-		else 
+		else
+		{
+			printf("DB error ".$error."\n");
 			return true;
+		}
 	}
 	
 	function updateAvatarDB($name,$uid)
@@ -143,17 +169,20 @@
 		//updates the preferred avatar of the user
 		$sql = "UPDATE prefs SET avatar = '".$name."' WHERE uid = '".$uid."'";
 		$result = mysqli_query($dbConnection, $sql);
-		if(!$result)
+		if($error = mysqli_error($dbConnection)=="")
 			return false;
 		else
+		{
+			printf("DB error ".$error."\n");
 			return true;
+		}
 	}
 	
 	function send_message($msg)
 	{
 		global $clients;
 		foreach($clients as $changed_socket)		//send message to all clients
-			@socket_write($changed_socket,$msg,strlen($msg));
+		@socket_write($changed_socket,$msg,strlen($msg));
 		return true;
 	}
 	//Unmask incoming framed message
@@ -177,7 +206,7 @@
 		}
 		$text = "";
 		for ($i = 0; $i < strlen($data); ++$i)
-			$text .= $data[$i] ^ $masks[$i%4];
+		$text .= $data[$i] ^ $masks[$i%4];
 		return $text;
 	}
 	
@@ -186,13 +215,13 @@
 	{
 		$b1 = 0x80 | (0x1 & 0x0f);
 		$length = strlen($text);
-	
+		
 		if($length <= 125)
-			$header = pack('CC', $b1, $length);
+		$header = pack('CC', $b1, $length);
 		else if($length > 125 && $length < 65536)
-			$header = pack('CCn', $b1, 126, $length);
+		$header = pack('CCn', $b1, 126, $length);
 		elseif($length >= 65536)
-			$header = pack('CCNN', $b1, 127, $length);
+		$header = pack('CCNN', $b1, 127, $length);
 		return $header.$text;
 	}
 	
@@ -205,9 +234,9 @@
 		{
 			$line = chop($line);
 			if(preg_match('/\A(\S+): (.*)\z/', $line, $matches))
-				$headers[$matches[1]] = $matches[2];
+			$headers[$matches[1]] = $matches[2];
 		}
-	
+		
 		$secKey = $headers['Sec-WebSocket-Key'];
 		$secAccept = base64_encode(pack('H*', sha1($secKey . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')));
 		//hand shaking header
@@ -219,7 +248,7 @@
 		"Sec-WebSocket-Accept:$secAccept\r\n\r\n";
 		socket_write($client_conn,$upgrade,strlen($upgrade));
 	}
-
+	
 	function writeToDB($uid, $content, $time)
 	{
 		global $dbConnection;
@@ -228,15 +257,10 @@
 		printf($sql."\n");
 		$result = mysqli_query($dbConnection, $sql);
 		$affRows =mysqli_affected_rows($dbConnection);
-		printf("Affected rows is: ".$affRows);
+		printf("Affected rows is: ".$affRows."\n");
 		if($affRows>0)
-		{
-	
-			return false;
-		}
+		return false;
 		else
-		{
-			return true;
-		}
+		return true;
 	}
 ?>

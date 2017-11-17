@@ -1,5 +1,7 @@
 
 var thisUid = 0;
+var bgID =0;
+var bgName=0;
 
 $(document).ready(function()
 {
@@ -8,7 +10,7 @@ $(document).ready(function()
 	
 	//sets emoticon click toggleSettings
 	$("#settingicon").on("onclick",toggleSettings);
-	
+		
 	//user clicks message send button	
 	$('#send-btn').click(sendMessage);
 		
@@ -16,14 +18,23 @@ $(document).ready(function()
 	//create a new WebSocket object.
 	var wsUri = "ws://"+location.host+":9000/CS3500/CS3500-Chate-Client/server.php"; 	
 	websocket = new WebSocket(wsUri);
-	websocket.onopen = function(ev){$('#messagebox').append("<div class=\"system_msg\">Connected!</div>");};
+	websocket.onopen = function(ev){$('#leftRail').append("<div class=\"system_msg\">Connected to server</div>");};
 	websocket.onmessage = messagedRecieved;
-	websocket.onerror	= function(ev){$('#messagebox').append("<div class=\"system_error\">Server Connection error Occurred - "+ev.data+"</div>");}; 
-	websocket.onclose 	= function(ev){$('#messagebox').append("<div class=\"system_msg\">Server Connection Closed</div>");}; 
+	websocket.onerror	= function(ev){$('#leftRail').append("<div class=\"system_error\">Server Connection error Occurred - "+ev.data+"</div>");}; 
+	websocket.onclose 	= function(ev){$('#leftRail').append("<div class=\"system_msg\">Server Connection Closed</div>");}; 
 	//end of websocket example-------------
 	
 	//get this uid from html
 	thisUid = $("#uid").html();
+	
+	//get this background name from html
+	bgID = $("#bgID").html();
+	bgName = $("#bgName").html();
+	
+	bg = document.getElementById("blur");
+	var path = "images/backgrounds/"+bgName;
+	bg.style.background = "url("+path+")";
+	
 });
 
 //Toggles the settings box as visible or not
@@ -87,14 +98,10 @@ function messagedRecieved(ev)
 	if(type == 'system')			//system level messages received
 	{
 		var umsg = msg.message; 	//message text
-		$('#messagebox').append("<div class=\"system_msg\">"+umsg+"</div>");
+		$('#leftRail').append("<div class=\"system_msg\">"+umsg+"</div>");
 	}
 	
 	$('#textmessage').val(''); //reset textinput 
-	
-	
-	
-	
 	
 	
 	
@@ -115,6 +122,26 @@ function updateAvatar(name)
 	};
 	//convert and send data to server
 	websocket.send(JSON.stringify(msg));
+	var clasname = "avatar "+thisUid;
+	var names = document.getElementsByClassName(clasname);
+	for (var i = 0; i < names.length; i++)
+		names[i].setAttribute("src", "images/avatars/"+name+".png");
+}
+function changeBG(name,id)
+{
+	//prepare json data
+	var msg =
+	{
+		type: "bg",
+		bgID: id,
+		uid: thisUid
+	};
+	//convert and send data to server
+	websocket.send(JSON.stringify(msg));
+	
+	bg = document.getElementById("blur");
+	var path = "images/backgrounds/"+name;
+	bg.style.background = "url("+path+")";
 }
 
 //Changes the users name color
@@ -129,6 +156,12 @@ function updateColor(color)
 	};
 	//convert and send data to server
 	websocket.send(JSON.stringify(msg));
+	
+	//change on page
+	var clasname = "username "+thisUid;
+	var names = document.getElementsByClassName(clasname);
+	for (var i = 0; i < names.length; i++)
+		names[i].style.color = color;
 }
 function toggleTheme() 
 {

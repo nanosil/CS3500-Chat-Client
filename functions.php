@@ -109,7 +109,7 @@ function getColors()
 	$temp=["darkgoldenrod","chocolate","goldenrod","yellow","orange","gold","coral","hotpink"];
 	$colors = array_merge($colors,$temp);
 	foreach($colors as $value)
-		echo "<div class='color' style='background-color: ".$value."' onclick='return updateColor(\"".$value."\")' ></div>";
+		echo "<div class='color' style='background-color: ".$value."' onclick='return updateColor(\"".$value."\")' ></div>\n";
 }
 
 function getAvatars()
@@ -127,7 +127,7 @@ function getAvatars()
 		while ($row = $result -> fetch_assoc())
 		{
 			$name = $row["name"];
-			echo "<img src='images/avatars/".$name.".png' class='thumbnail' id='".$name."' onclick='return updateAvatar(\"".$name."\")'/>";
+			echo "<img src='images/avatars/".$name.".png' class='thumbnail' id='".$name."' onclick='return updateAvatar(\"".$name."\")'/>\n";
 		}
 		return true;
 	}
@@ -137,7 +137,7 @@ function getMessagesOnLoad()
 {
 	global $dbConnection;
 	//gets content, time sent, username, profile picture, and username color of each message in the database
-	$sql = "SELECT content, time, name, avatar, color FROM messages, user, prefs WHERE user.id = messages.uid AND user.id = prefs.uid";
+	$sql = "SELECT * FROM messages, user, prefs WHERE user.id = messages.uid AND user.id = prefs.uid";
 	
 	$result = mysqli_query($dbConnection, $sql);
 	
@@ -161,7 +161,7 @@ function getMessagesOnLoad()
 			if($prevUser == $row['name'] && $c < 5)
 			{
 				//only echo the message content itself
-				echo "<p>".$row['content']."</p>";
+				echo "<p>".$row['content']."</p>\n";
 				//increment the counter
 				$c++;
 				//else if the current message is from a different user than the previous message and this is not the first message returned from the sql query
@@ -177,13 +177,15 @@ function getMessagesOnLoad()
 				//begin echoing data of the current sql query row
 				echo "<div id='' class='message'>";
 				//prints user's avatar
-				echo "<img src='images/avatars/".$row['avatar'].".png' class='avatar' />";
+				echo "<div class = avatar>";
+				echo "<img src='images/avatars/".$row['avatar'].".png' class='avatar  ".$row['uid']."' />";
+				echo "</div>";
 				
 				//begins the div that contains all the text data of the message i.e. not the avatar
 				echo "<div id='' class='messagecontentcontainer'>";
 				
 				//prints user's name and gives it the appropriate color
-				echo "<div id='' class='username' style='color: ".$row['color']."'>".$row['name']."</div>";
+				echo "<div id='' class='username ".$row['uid']."' style='color: ".$row['color']."'>".$row['name']."</div>";
 				
 				//store the name of the user so we can compare it with the next row in the sql query
 				$prevUser = $row['name'];
@@ -195,7 +197,7 @@ function getMessagesOnLoad()
 				
 				//prints the content of the message itself
 				echo "<div id='' class='messagecontent'>";
-				echo "<p>".$row['content']."</p>";			
+				echo "<p>".$row['content']."</p>\n";			
 				//else if the current user is the same as the previous user but this is their sixth consecutive message
 			} 
 			else if($prevUser == $row['name'] && $c >= 5)
@@ -212,7 +214,7 @@ function getMessagesOnLoad()
 				$c = 0;
 				echo "<small>".$row['time']."</small>";
 				echo "<div id='' class='messagecontent'>";
-				echo "<p>".$row['content']."</p>";				
+				echo "<p>".$row['content']."</p>\n";				
 				//else if this is the first message in the database	
 			} 
 			else if($first)
@@ -230,7 +232,7 @@ function getMessagesOnLoad()
 				$c = 0;
 				echo "<small>".$row['time']."</small>";
 				echo "<div id='' class='messagecontent'>";
-				echo "<p>".$row['content']."</p>";
+				echo "<p>".$row['content']."</p>\n";
 			}
 		}
 		//closes the tags that were opened in the very last message block returned from the whole sql query
@@ -241,6 +243,43 @@ function getMessagesOnLoad()
 	} 
 	else 
 		echo "No messages yet.";
+}
+
+function getBgID()
+{
+	global $dbConnection;
+	$uid = $_SESSION['id'];
+	$sql = "SELECT * FROM backgrounds JOIN prefs on prefs.uid = $uid AND prefs.bg = backgrounds.bgID";
+	$result = mysqli_query($dbConnection, $sql);
+	if($error = mysqli_error($dbConnection)=="")
+	{
+		$row = $result -> fetch_assoc();
+		echo $row["bgID"];
+		return true;
+	}
+	else
+	{
+		echo "SQL error: ".mysqli_error ($dbConnection);
+		return false;
+	}
+}
+function getBgName()
+{
+	global $dbConnection;
+	$uid = $_SESSION['id'];
+	$sql = "SELECT * FROM backgrounds JOIN prefs on prefs.uid = $uid AND prefs.bg = backgrounds.bgID";
+	$result = mysqli_query($dbConnection, $sql);
+	if($error = mysqli_error($dbConnection)=="")
+	{
+		$row = $result -> fetch_assoc();
+		echo $row["filename"];
+		return true;
+	}
+	else
+	{
+		echo "SQL error: ".mysqli_error ($dbConnection);
+		return false;
+	}
 }
 
 function getBackgrounds()
@@ -257,7 +296,8 @@ function getBackgrounds()
 	{
 		while ($row = $result -> fetch_assoc())
 		{
-			echo "<img height=\"42\" width=\"42\" src = 'images/backgrounds/".$row["filename"]."'>";
+			echo "<img class = 'backgrounds' src = 'images/backgrounds/".$row["filename"]." '";
+			echo " onclick = changeBG(\"".$row["filename"]."\",".$row["bgID"].")>\n";
 		}
 		return true;
 	}
